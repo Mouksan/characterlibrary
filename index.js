@@ -971,7 +971,6 @@ function renderCollapsibleSection(title, bodyHtml, emptyText, extraClass = '') {
 function renderModal(character) {
     const isOverview = state.modalTab === 'overview';
     const creatorMeta = [character.version].filter(Boolean).join(' - ');
-    const descriptionHtml = renderTextBlockContent(character.description, { allowHtml: true });
     const firstMessageHtml = renderTextBlockContent(character.firstMessage, { enableMessageFormatting: true, highlightQuotes: true });
     const personalityHtml = renderTextBlockContent(character.personality, { allowHtml: true });
     const creatorName = normalizeString(character.creator);
@@ -1032,7 +1031,6 @@ function renderModal(character) {
                                 </section>
                             </div>
                             <div class="acl-modal-details">
-                                ${renderCollapsibleSection('Creator\'s Notes', descriptionHtml, 'No creator notes yet.', 'acl-modal-copy-section')}
                                 ${renderCollapsibleSection('First message', firstMessageHtml, 'No first message found.', 'acl-modal-copy-section')}
                                 ${renderCollapsibleSection('Description', personalityHtml, 'No description set.', 'acl-modal-copy-section')}
                             </div>
