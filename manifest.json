@@ -1,7 +1,7 @@
 {
-  "display_name": "Character Library",
+  "display_name": "Another Character Library",
   "author": "Mouksan",
-  "version": "1.0.0",
+  "version": "0.6.0",
   "loading_order": 25,
   "requires": [],
   "optional": [],
@@ -9,4 +9,3 @@
   "js": "index.js",
   "css": "style.css"
 }
-

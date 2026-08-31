@@ -1,5 +1,5 @@
-const EXTENSION_NAME = 'character-library';
-const EXTENSION_TITLE = 'Character Library';
+const EXTENSION_NAME = 'another-character-library';
+const EXTENSION_TITLE = 'Another Character Library';
 const SETTINGS_KEY = EXTENSION_NAME;
 const TAGMOJIS_BRIDGE_KEY = '__tagmojisBridge';
 
