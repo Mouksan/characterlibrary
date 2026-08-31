@@ -1,13 +1,12 @@
 {
-    "display_name": "Character Library",
-    "loading_order": 100,
-    "requires": [],
-    "optional": [],
-    "dependencies": [],
-    "js": "index.js",
-    "css": "style.css",
-    "author": "Mouksan",
-    "version": "1.0.0",
-    "homePage": "",
-    "auto_update": true
+  "display_name": "Character Library",
+  "author": "Mouksan",
+  "version": "1.0.0",
+  "loading_order": 25,
+  "requires": [],
+  "optional": [],
+  "homePage": "https://github.com/Mouksan/characterlibrary",
+  "js": "index.js",
+  "css": "style.css"
 }
+
