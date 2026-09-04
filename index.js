@@ -1508,26 +1508,45 @@ async function toggleFavorite(characterKey) {
 
 async function openCharacterChat(character) {
     const context = getContextSafe();
-    const candidateMethods = [
-        typeof context?.openCharacterChat === 'function' ? () => context.openCharacterChat(character.raw) : null,
-        typeof context?.selectCharacterById === 'function' ? () => context.selectCharacterById(character.index) : null,
-        typeof context?.setCharacterId === 'function' ? () => context.setCharacterId(character.index) : null,
-        typeof globalThis.selectCharacterById === 'function' ? () => globalThis.selectCharacterById(character.index) : null,
-        typeof globalThis.openCharacterChat === 'function' ? () => globalThis.openCharacterChat(character.raw) : null,
-    ].filter(Boolean);
 
-    for (const invoke of candidateMethods) {
-        try {
-            await invoke?.();
-            state.selectedCharacterKey = null;
-            scheduleRender();
-            return;
-        } catch (error) {
-            log('Chat open attempt failed', error);
-        }
+    if (!Number.isInteger(character?.index)) {
+        console.warn(`[${EXTENSION_NAME}] Character has no usable index; refusing to switch chats.`);
+        return;
     }
 
-    console.warn(`[${EXTENSION_NAME}] No compatible chat-open API was found.`);
+    // Flush the chat that is currently open before SillyTavern swaps it out of memory.
+    // Without this, anything not yet auto-saved dies with the in-memory chat array.
+    try {
+        if (context?.getCurrentChatId?.() && typeof context?.saveChat === 'function') {
+            await context.saveChat();
+        }
+    } catch (error) {
+        log('Could not flush the active chat before switching', error);
+    }
+
+    // selectCharacterById is the only safe entry point: it deselects the previous
+    // character, clears the chat, sets the new id and then loads that character's own
+    // chat file. Anything lower-level leaves the character id and the chat array out of
+    // sync, which makes the next auto-save write messages into the wrong chat.
+    const select = typeof context?.selectCharacterById === 'function'
+        ? (index) => context.selectCharacterById(index)
+        : typeof globalThis.selectCharacterById === 'function'
+            ? (index) => globalThis.selectCharacterById(index)
+            : null;
+
+    if (!select) {
+        console.warn(`[${EXTENSION_NAME}] No compatible chat-open API was found.`);
+        return;
+    }
+
+    try {
+        await select(character.index);
+        state.selectedCharacterKey = null;
+        scheduleRender();
+    } catch (error) {
+        log('Chat open attempt failed', error);
+        notifyError('Could not open this chat. Check the console for details.', 'Open failed');
+    }
 }
 
 async function openNativeCharacterEditor(character) {
