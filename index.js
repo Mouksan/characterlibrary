@@ -1514,16 +1514,6 @@ async function openCharacterChat(character) {
         return;
     }
 
-    // Flush the chat that is currently open before SillyTavern swaps it out of memory.
-    // Without this, anything not yet auto-saved dies with the in-memory chat array.
-    try {
-        if (context?.getCurrentChatId?.() && typeof context?.saveChat === 'function') {
-            await context.saveChat();
-        }
-    } catch (error) {
-        log('Could not flush the active chat before switching', error);
-    }
-
     // selectCharacterById is the only safe entry point: it deselects the previous
     // character, clears the chat, sets the new id and then loads that character's own
     // chat file. Anything lower-level leaves the character id and the chat array out of
@@ -1539,6 +1529,16 @@ async function openCharacterChat(character) {
         return;
     }
 
+    // Serialize switches. selectCharacterById clears the in-memory chat, sets the new
+    // character id and only then loads that character's chat file. A second switch that
+    // lands inside that window sees a character id with an empty chat array attached,
+    // and anything that auto-saves at that moment writes the empty array to disk.
+    if (state.chatSwitchInFlight) {
+        log('Ignoring chat open while another switch is still running.');
+        return;
+    }
+
+    state.chatSwitchInFlight = true;
     try {
         await select(character.index);
         state.selectedCharacterKey = null;
@@ -1546,6 +1546,8 @@ async function openCharacterChat(character) {
     } catch (error) {
         log('Chat open attempt failed', error);
         notifyError('Could not open this chat. Check the console for details.', 'Open failed');
+    } finally {
+        state.chatSwitchInFlight = false;
     }
 }
 
