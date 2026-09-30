@@ -577,6 +577,10 @@ function render() {
     const { items, totalPages, totalCharacters } = getPagedCharacters(state.filteredCharacters);
 
     root.innerHTML = `
+        <div class="acl-tg-bar">
+            <button type="button" class="tg-header-btn acl-tg-bar-menu" data-action="tg-open-drawer" aria-label="Menu" title="Menu"></button>
+            <div class="acl-tg-bar-title">SillyTavern</div>
+        </div>
         <div class="acl-backdrop"></div>
         <div class="acl-page">
             <header class="acl-topbar">
@@ -1324,6 +1328,18 @@ function getCharacterByActionElement(element) {
     return state.characters.find((character) => character.key === key) ?? null;
 }
 
+// Telegram theme: the landing page hides #sheld together with the Telegram header,
+// so its hamburger is unreachable here. Press the real one (it still exists in the DOM)
+// so the drawer logic stays owned by the theme; toggle its body class only as a fallback.
+function openTelegramDrawer() {
+    const nativeButton = document.querySelector('#sheld > .tg-header .tg-header-back');
+    if (nativeButton instanceof HTMLElement) {
+        nativeButton.click();
+        return;
+    }
+    document.body.classList.toggle('tg-drawer-open');
+}
+
 async function onRootClick(event) {
     const actionElement = closestActionElement(event.target);
     if (!actionElement) {
@@ -1352,6 +1368,9 @@ async function onRootClick(event) {
     const character = getCharacterByActionElement(actionElement);
 
     switch (action) {
+        case 'tg-open-drawer':
+            openTelegramDrawer();
+            break;
         case 'switch-tab':
             settings.activeTab = actionElement.getAttribute('data-tab') || 'all';
             state.page = 1;

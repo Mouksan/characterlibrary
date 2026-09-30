@@ -1330,3 +1330,54 @@ body.acl-landing-active #sheld {
         transform: none;
     }
 }
+
+/* ── Telegram theme: top bar with the drawer hamburger ─────────────────── */
+/* Hidden unless ST Telegram is on. Every value comes from the theme's own tokens,
+   so day/night and accent changes repaint the bar exactly like the chat header. */
+.acl-tg-bar {
+    display: none;
+}
+
+/* The bar sits at the very top, so the page content starts right under it.
+   !important is needed to beat the inline value render() writes from measureTopInset(). */
+html[data-tg-enabled='on'] #another-character-library-root {
+    --acl-top-offset: var(--tg-header-height, 56px) !important;
+}
+
+html[data-tg-enabled='on'] #another-character-library-root .acl-tg-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--tg-header-height, 56px);
+    padding: 0 4px 0 2px;
+    box-sizing: border-box;
+    background: var(--tg-header-bg);
+    color: var(--tg-header-text);
+    box-shadow: var(--tg-shadow-header);
+    font-family: var(--tg-font-ui);
+    user-select: none;
+}
+
+/* Look and hover come from the theme's .tg-header-btn; only the icon is chosen here. */
+html[data-tg-enabled='on'] #another-character-library-root .acl-tg-bar-menu {
+    --tg-btn-icon: var(--tg-icon-menu);
+}
+
+/* Same size and weight as the chat header's app title when no chat is open. */
+html[data-tg-enabled='on'] #another-character-library-root .acl-tg-bar-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-left: 6px;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--tg-header-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
